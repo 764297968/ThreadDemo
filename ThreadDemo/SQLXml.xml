@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Sql>
+  <GetExcutePage>
+    Select * from (
+    SELECT  ROW_NUMBER() OVER(ORDER BY QS.creation_time ) [RecordID],
+
+    QS.execution_count AS Execution_Count,
+    QS.total_elapsed_time AS Total_Elapsed_Time,
+    QS.total_logical_reads AS Total_Logical_Reads,
+    QS.total_logical_writes AS Total_Logical_Writes,
+    QS.total_physical_reads AS Total_Physical_Reads,
+    QS.creation_time AS Creation_Time  ,
+    ST.dbid DatabaseId, ST.text AS ExecQueryText
+    FROM   sys.dm_exec_query_stats QS
+    CROSS APPLY
+    sys.dm_exec_sql_text(QS.sql_handle) ST
+    WHERE  1=1 {0}
+    ) AS Data WHERE [RecordID] BETWEEN {1} AND {2}
+  </GetExcutePage>
+</Sql>
